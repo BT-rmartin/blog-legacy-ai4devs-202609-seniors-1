@@ -3,10 +3,22 @@
 Un blog con posts, autores, categorías, etiquetas y comentarios. Monorepo con **AdonisJS 7 +
 SQLite** en `backend/` y **React 19 + Vite** en `frontend/`.
 
-Este es el sistema sobre el que trabajas en el Módulo 6. Léelo entero antes de empezar: además
+Este es el sistema sobre el que trabajas en el Módulo 6, en la lección **«Ejercicio Blog Legacy»**. Léelo entero antes de empezar: además
 de cómo levantarlo, aquí está **el ejercicio y cómo se entrega**.
 
 ## Arrancarlo
+
+**Funciona en macOS y en Linux, y en Windows dentro de WSL** (Windows Subsystem for Linux). **No en
+PowerShell**: el `Makefile` está escrito para la terminal de macOS y Linux (`cp`, `test`, `rm`), y
+ahí falla aunque instales `make`. En Windows, haz todo dentro de la terminal de Ubuntu de WSL: el
+clon, Node y `make`.
+
+Necesitas, en esa terminal:
+
+- **Node.js 24 o superior** (`node -v`). Con la 20, `make setup` se para con
+  `Unknown file extension ".ts"`; con la 22 arranca, pero con avisos `EBADENGINE`.
+- **`make`** (`make --version`). macOS: `xcode-select --install`. Linux y WSL con Ubuntu:
+  `sudo apt install make`.
 
 No hay `package.json` en la raíz. Los comandos de `npm` se ejecutan dentro de `backend/` y de
 `frontend/`, y el `Makefile` de la raíz ya lo hace por ti.
@@ -14,13 +26,15 @@ No hay `package.json` en la raíz. Los comandos de `npm` se ejecutan dentro de `
 ```bash
 make setup   # instala backend y frontend, y prepara backend/.env
 make db      # crea la base SQLite y la siembra
-make api     # API   → http://localhost:3401
-make web     # web   → http://localhost:5401   (en otra terminal)
+make api     # API   → http://localhost:3401   (se queda corriendo)
+make web     # web   → http://localhost:5401   (en otra terminal; se queda corriendo)
 make test    # la suite
 ```
 
 Los puertos son **3401** y **5401** a propósito, para no chocar con los que suele ocupar un
-proyecto Adonis o Vite recién creado.
+proyecto Adonis o Vite recién creado. Son **fijos**: la web busca la API exactamente en el 3401.
+Para comprobar que todo vive: `curl -s localhost:3401/posts` devuelve posts en JSON, y
+`http://localhost:5401` enseña el blog.
 
 ## Superficie de la API
 
@@ -83,11 +97,15 @@ por eso conviene mirar el directo sin teclear, porque lo vas a repetir con calma
 
 ## Parte A: la auditoría, con reloj
 
-Con un agente, produce **la auditoría priorizada de una sola rebanada** y déjala escrita en
-`docs/auditoria/<rebanada>.md`, no en el chat.
+Con un agente, produce **la auditoría priorizada de la feature de comentarios** y déjala escrita
+en `docs/auditoria/comentarios.md`, no en el chat.
 
-**Una sola rebanada.** Una capa, o un grupo de rutas que gestionan la misma cosa. No el sistema
-entero, aunque quepa y aunque el agente se ofrezca.
+**Una feature es una funcionalidad del blog de punta a punta**: sus rutas en la API, su tabla en la
+base de datos y lo que la web enseña de ella. Este blog tiene cinco (posts, comentarios, autores,
+categorías y etiquetas), y **la tuya es comentarios**: crear, editar, borrar y listar comentarios,
+en esas tres capas. Es la misma que audita el mentor en el directo.
+
+**Solo esa feature.** No el sistema entero, aunque quepa y aunque el agente se ofrezca.
 
 **El formato no es negociable**: una fila por hallazgo, con estas seis casillas.
 
@@ -129,8 +147,12 @@ vas a crear una rama y commitear.
 ```bash
 git clone git@github.com:<tu-usuario>/blog-legacy-ai4devs.git
 cd blog-legacy-ai4devs
-git checkout s6/start
+git remote add upstream git@github.com:LIDR-academy/blog-legacy-ai4devs.git
+git fetch upstream
+git checkout -b s6/start upstream/s6/start
 ```
+
+> 🚨 **Por qué se trae de `upstream` y no con un `git checkout s6/start` a secas.** El formulario de Fork de GitHub trae marcada la casilla **«Copy the default branch only»**, así que tu fork nace **solo con `main`**. Traer la rama del repositorio del curso funciona en los dos casos: hayas desmarcado la casilla o no.
 
 > 📌 Si te sale `Permission denied (publickey)`, es SSH y no el fork. La guía oficial está en
 > `docs.github.com/es/authentication/connecting-to-github-with-ssh`.
@@ -158,7 +180,7 @@ Contra este repositorio. Con tu rama empujada, GitHub te ofrece el botón arriba
 
 ```bash
 git add docs/auditoria prompts.md
-git commit -m "auditoria: <rebanada> + prompts"
+git commit -m "auditoria: comentarios + prompts"
 git push -u origin auditoria-<tus-iniciales>
 ```
 
